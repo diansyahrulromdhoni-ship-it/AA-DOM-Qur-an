@@ -76,6 +76,14 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Handle SPA HTML navigations: Network-first, fallback to /index.html
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match('/index.html'))
+    );
+    return;
+  }
+
   // For static app shell and assets: Stale-While-Revalidate or Cache-First
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
